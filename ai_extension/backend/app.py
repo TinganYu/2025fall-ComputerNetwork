@@ -20,24 +20,28 @@ def ask():
     user_text = data.get("text", "")
     if not user_text:
         return jsonify({"error": "Missing text"}), 400
-
     prompt = f"你是一位知識淺顯易懂的中文助教，請用簡短中文解釋下列問題：{user_text}"
+    
+    if not GROQ_API_KEY:
+        return jsonify({"error": "GROQ_API_KEY is missing"}), 500
+    
+    try:
+        res = requests.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {GROQ_API_KEY}"},
+            json={
+                "model": "llama-3.1-8b-instant",
+                "messages": [{"role": "user", "content": prompt}]
+            },
+            timeout=20
+        )
+        res.raise_for_status()  # 如果不是 200 就會拋例外
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": str(e)}), 500
 
-    res = requests.post(
-        "https://api.groq.com/openai/v1/chat/completions",
-        headers={"Authorization": f"Bearer {GROQ_API_KEY}"},
-        json={
-            "model": "llama-3.1-8b-instant",
-            "messages": [{"role": "user", "content": prompt}]
-        },
-        timeout=20
-    )
+    try:
+        reply = res.json()["choices"][0]["message"]["content"]
+    except (KeyError, IndexError) as e:
+        return jsonify({"error": f"Invalid API response: {res.text}"}), 500
 
-    if res.status_code != 200:
-        return jsonify({"error": res.text}), 500
-
-    reply = res.json()["choices"][0]["message"]["content"]
     return jsonify({"reply": reply})
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
