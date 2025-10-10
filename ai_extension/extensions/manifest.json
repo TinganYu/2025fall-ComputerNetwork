@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "AI Helper",
+  "version": "1.0",
+  "description": "選取文字後請 AI 幫你解釋",
+  "permissions": ["activeTab", "scripting", "contextMenus"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "AI Helper"
+  },
+  "background": {
+    "service_worker": "content.js"
+  }
+}
