@@ -29,3 +29,33 @@ ai-extension/
 │   └── content.js
 │
 └── firebase.json            ← Firebase 設定檔
+
+
+架構三:
+project-root/
+│
+├── extension/
+│   ├── manifest.json
+│   ├── background.js
+│   ├── content.js
+│   ├── popup/
+│   │   ├── popup.html
+│   │   └── popup.js
+│   ├── ui/
+│   │   ├── focus-alert.html
+│   │   └── focus-alert.js
+│   ├── utils/
+│   │   ├── storage.js   # 本地記錄/取資料
+│   │   └── focusCalc.js # 專注度公式
+│   └── icons/
+│
+├── server/  (Render)
+│   ├── index.js  # Express 主程式
+│   ├── routes/
+│   │   ├── ai.js         # 呼叫 OpenAI Threads
+│   │   └── records.js    # 儲存/查詢使用者紀錄
+│   ├── db/
+│   │   └── schema.sql    # 如用 PostgreSQL
+│   └── package.json
+│
+└── README.md
