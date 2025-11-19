@@ -30,7 +30,7 @@ ai-extension/
 │
 └── firebase.json            ← Firebase 設定檔
 
-
+```
 架構三:
 project-root/
 │
@@ -59,3 +59,4 @@ project-root/
 │   └── package.json
 │
 └── README.md
+```
