@@ -1,10 +1,3 @@
-// // content.js
-// document.addEventListener("mouseup", () => {
-//   const selectedText = window.getSelection().toString();
-//   if (selectedText) {
-//     chrome.runtime.sendMessage({ text: selectedText });
-//   }
-// });
 // 建立浮動框（初始隱藏）
 let aiDiv = document.createElement("div");
 aiDiv.id = "ai-popup-div";
