@@ -46,8 +46,9 @@ function initializeModal(initialText) {
     if (aiModal) return;
 
     if (!document.body) {
-        console.error("無法找到 document.body，暫時無法注入 UI。");
-        return;
+      console.warn("HackMD 或 SPA 重新載入 iframe 中，等 100ms 再試");
+      console.error("無法找到 document.body，暫時無法注入 UI。");
+      return;
     }
 
     // A. 建立 UI 元素
