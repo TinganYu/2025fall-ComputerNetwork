@@ -7,7 +7,7 @@ chrome.runtime.onMessage.addListener((message) => {
         if (!aiModal) {
             initializeModal(message.text);
         } else {
-            currentSelectedText = message.text;
+            currentSelectedText = message.text|| "";
             inputArea.value = "";
             outputDiv.textContent = "請輸入您對選取內容的需求（如：提供大綱、翻譯等）";
             aiModal.style.display = "flex";
