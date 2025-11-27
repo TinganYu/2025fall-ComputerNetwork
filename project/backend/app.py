@@ -20,8 +20,20 @@ def ask():
     user_text = data.get("text", "")
     if not user_text:
         return jsonify({"error": "Missing text"}), 400
-    prompt = f"你是一位知識淺顯易懂的中文助教，請用簡短中文解釋下列問題：{user_text}"
     
+    # 設置 System Prompt (定義 AI 角色)
+    system_prompt = (
+        "你是一位專業且熱忱的『中文寫作助手』。你的目標是根據使用者提供的文章內容和需求，"
+        "提供實用、精確、具有建設性的寫作建議或協助完成指定任務。"
+        "請使用清晰、流暢且專業的中文進行回覆。"
+    )
+    
+    # 將 System Prompt 和使用者輸入結合
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_text}
+    ]
+
     if not GROQ_API_KEY:
         return jsonify({"error": "GROQ_API_KEY is missing"}), 500
     
@@ -31,7 +43,7 @@ def ask():
             headers={"Authorization": f"Bearer {GROQ_API_KEY}"},
             json={
                 "model": "llama-3.1-8b-instant",
-                "messages": [{"role": "user", "content": prompt}]
+                "messages": [{"role": "user", "content": messages}]
             },
             timeout=20
         )
