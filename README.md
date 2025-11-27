@@ -49,7 +49,7 @@ project-root/
 │   │   └── focusCalc.js # 專注度公式
 │   └── icons/
 │
-├── server/  (Render)
+├── backend/  (Render)
 │   ├── index.js  # Express 主程式
 │   ├── routes/
 │   │   ├── ai.js         # 呼叫 OpenAI Threads
