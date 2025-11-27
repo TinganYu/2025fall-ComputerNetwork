@@ -1,30 +1,3 @@
-// // 建立浮動框（初始隱藏）
-// let aiDiv = document.createElement("div");
-// aiDiv.id = "ai-popup-div";
-// aiDiv.style.position = "fixed";
-// aiDiv.style.bottom = "20px";
-// aiDiv.style.right = "20px";
-// aiDiv.style.backgroundColor = "white";
-// aiDiv.style.border = "1px solid black";
-// aiDiv.style.padding = "10px";
-// aiDiv.style.zIndex = "9999";
-// aiDiv.style.maxWidth = "300px";
-// aiDiv.style.boxShadow = "0px 0px 5px rgba(0,0,0,0.3)";
-// aiDiv.style.display = "none"; // 初始隱藏
-// document.body.appendChild(aiDiv);
-
-// // 監聽 background.js 傳來的訊息
-// chrome.runtime.onMessage.addListener((message) => {
-//   if (message.reply) {
-//     aiDiv.textContent = message.reply;
-//     aiDiv.style.display = "block"; // 顯示
-//     // 自動 5 秒消失
-//     setTimeout(() => {
-//       aiDiv.style.display = "none";
-//     }, 5000);
-//   }
-// });
-
 //監聽打字(目前測試：gemini、hackmd、colab讀的到，google doc、word線上版讀不到)
 let keyCount = 0
 let backspaceCount = 0;
@@ -52,8 +25,6 @@ chrome.storage.local.get(["keyCount", "backspaceCount", "keyTimestamps"], (data)
 // --- AI 彈出視窗邏輯 ---
 
 // 1. 建立 UI 元素 (使用更簡潔的 HTML 結構)
-let aiModal = document.createElement("div");
-aiModal.id = "ai-modal-overlay";
 let aiModal = document.createElement("div");
 aiModal.id = "ai-modal-panel"; // 更改 ID 以區別它是面板
 aiModal.style.cssText = `
