@@ -50,13 +50,12 @@ project-root/
 │   └── icons/
 │
 ├── backend/  (Render)
-│   ├── index.js  # Express 主程式
-│   ├── routes/
-│   │   ├── ai.js         # 呼叫 OpenAI Threads
-│   │   └── records.js    # 儲存/查詢使用者紀錄
+│   ├── app.py  # 主程式
+│   ├── .env
+│   ├── utils/       # (可選) 存放 AI 或 DB 連線的輔助函數?
 │   ├── db/
 │   │   └── schema.sql    # 如用 PostgreSQL
-│   └── package.json
+│   └── package.json?
 │
 └── README.md
 ```
