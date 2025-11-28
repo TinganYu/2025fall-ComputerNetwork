@@ -1,3 +1,32 @@
+const QUICK_PROMPTS = {
+    summarize: "請將下列選取的內容，用簡潔、清晰的中文進行摘要及文章重點。",
+    translate: "請將下列選取的內容，翻譯成流暢的中文。",
+    beautify: "請檢查下列選取的內容的語法和詞彙，並將其潤飾美化，使語言更專業流暢。",
+};
+//監聽打字(目前測試：gemini、hackmd、colab讀的到，google doc、word線上版讀不到)
+let keyCount = 0
+let backspaceCount = 0;
+let keyTimestamps = []; //每次按按鍵的時間
+
+chrome.storage.local.get(["keyCount", "backspaceCount", "keyTimestamps"], (data) => {//繼承之前/其他網站的行為資料
+  keyCount = data.keyCount || 0;
+  backspaceCount = data.backspaceCount || 0;
+  keyTimestamps = data.keyTimestamps || []; 
+  if(keyTimestamps.length > 0){
+      if(Date.now() - keyTimestamps.at(-1) > 14400000){ //4hr沒打字就重置(長期專注度記錄再另外放在後端)
+      keyTimestamps = [];
+      keyCount = 0;
+      backspaceCount = 0;
+    }
+  }
+  document.addEventListener("keydown", (e) =>{
+    keyCount++;
+    keyTimestamps.push(Date.now()); 
+    if (e.key === "Backspace") backspaceCount++;
+    chrome.storage.local.set({keyCount, backspaceCount, keyTimestamps});
+  });
+});
+
 // Simple, robust content script for testing and modal UI
 if (window.__FOCUSTYPING_LOADED__) {
   console.log("[FocusTyping] already loaded");
@@ -16,35 +45,10 @@ if (window.__FOCUSTYPING_LOADED__) {
       }
     }
 
-    // simple typing tracker (non-intrusive)
-    let keyCount = 0
-    let backspaceCount = 0;
-    let keyTimestamps = []; //每次按按鍵的時間
-
-    chrome.storage.local.get(["keyCount", "backspaceCount", "keyTimestamps"], (data) => {
-      keyCount = data.keyCount || 0;
-      backspaceCount = data.backspaceCount || 0;
-      keyTimestamps = data.keyTimestamps || []; 
-      if (keyTimestamps.length > 0) {
-        if (Date.now() - keyTimestamps.at(-1) > 14400000) {
-          keyTimestamps = [];
-          keyCount = 0;
-          backspaceCount = 0;
-        }
-      }
-
-      // 🔥 這段絕對要放在（iframe 的 content script 裡）
-      document.addEventListener("keydown", (e) => {
-        keyCount++;
-        keyTimestamps.push(Date.now()); 
-        if (e.key === "Backspace") backspaceCount++;
-        chrome.storage.local.set({keyCount, backspaceCount, keyTimestamps});
-      });
-    });
 
     // ---------- Modal UI (simple, draggable) ----------
     let aiModal = null, inputArea = null, outputDiv = null, sendBtn = null, closeBtn = null;
-    let currentSelectedText = "";
+    // let currentSelectedText = "";
 
     function createModal(initialText) {
       if (aiModal) return; // already
@@ -66,6 +70,23 @@ if (window.__FOCUSTYPING_LOADED__) {
       closeBtn = document.createElement("button"); closeBtn.textContent = "✕"; closeBtn.style.border="none"; closeBtn.style.background="none"; closeBtn.style.cursor="pointer";
       header.appendChild(title); header.appendChild(closeBtn);
 
+      // ⚡ 新增：快捷按鈕容器
+      const quickButtonsDiv = document.createElement("div");
+      quickButtonsDiv.style.cssText = "display:flex; justify-content:space-between; margin-top:8px; margin-bottom:10px;";
+
+      const buttonNames = ["摘要", "翻譯成中文", "美化"];
+      const buttonActions = ["summarize", "translate", "beautify"];
+
+      buttonNames.forEach((name, index) => {
+          const btn = document.createElement("button");
+          btn.textContent = name;
+          btn.setAttribute('data-action', buttonActions[index]); // 設置動作標籤
+          btn.style.cssText = "padding:6px 8px; flex-grow:1; margin-right:5px; background:#e9ecef; color:#343a40; border:1px solid #ced4da; border-radius:4px; cursor:pointer; font-size:0.9em;";
+          if (index === buttonNames.length - 1) btn.style.marginRight = "0"; // 最後一個按鈕移除右邊距
+          
+          quickButtonsDiv.appendChild(btn);
+      });
+
       inputArea = document.createElement("textarea");
       inputArea.style.cssText = "width:100%;height:80px;box-sizing:border-box;padding:6px;margin-top:6px";
       inputArea.placeholder = "輸入您的問題...";
@@ -79,6 +100,7 @@ if (window.__FOCUSTYPING_LOADED__) {
       outputDiv.textContent = "...";
 
       aiModal.appendChild(header);
+      aiModal.appendChild(quickButtonsDiv);
       aiModal.appendChild(inputArea);
       aiModal.appendChild(sendBtn);
       aiModal.appendChild(outputDiv);
@@ -87,15 +109,15 @@ if (window.__FOCUSTYPING_LOADED__) {
       // handlers
       closeBtn.addEventListener("click", () => aiModal.style.display = "none");
       sendBtn.addEventListener("click", () => {
-        const txt = inputArea.value.trim();
-        if (!txt) { outputDiv.textContent = "請輸入問題"; return; }
+        const currentSelectedText = inputArea.value.trim();
+        if (!currentSelectedText) { outputDiv.textContent = "請輸入問題"; return; }
         outputDiv.textContent = "AI 正在思考中...";
         sendBtn.disabled = true;
 
         fetch("https://two025fall-computernetwork.onrender.com/ask", {
           method: "POST",
           headers: {"Content-Type":"application/json"},
-          body: JSON.stringify({ text: txt })
+          body: JSON.stringify({ text: currentSelectedText })
         })
         .then(r => r.json().catch(()=>{}))
         .then(data => {
@@ -109,11 +131,57 @@ if (window.__FOCUSTYPING_LOADED__) {
         })
         .finally(()=> sendBtn.disabled = false);
       });
+      // ⚡ 新增：快捷按鈕監聽器
+      quickButtonsDiv.querySelectorAll('button').forEach(btn => {
+          btn.addEventListener('click', () => {
+              const action = btn.getAttribute('data-action');
+              const promptTemplate = QUICK_PROMPTS[action];
+              const currentSelectedText = inputArea.value.trim();
+              if (!currentSelectedText) {
+                  outputDiv.textContent = "請先選取您要處理的文字。";
+                  return;
+              }
 
+              // 組合 Prompt: 系統模板 + 選取內容
+              const fullTextForAI = `${promptTemplate}\n\n選取的內容：【${currentSelectedText}】`;
+
+              // 執行自動 Fetch
+              autoFetchAI(fullTextForAI);
+          });
+      });
       makeDraggable(aiModal, header);
 
       // fill initial
       if (initialText) inputArea.value = initialText;
+    }
+    // ⚡ 輔助函式：用於處理快捷按鈕的 Fetch 請求 (放在 createModal 外部)
+    function autoFetchAI(fullTextForAI) {
+        // 設置狀態
+        outputDiv.textContent = "AI 正在思考中...";
+        sendBtn.disabled = true; 
+        
+        // 將所有快捷按鈕禁用，避免重複點擊
+        const quickButtons = aiModal.querySelectorAll('[data-action]');
+        quickButtons.forEach(b => b.disabled = true);
+
+        fetch("https://two025fall-computernetwork.onrender.com/ask", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: fullTextForAI })
+        })
+        .then(res => res.json())
+        .then(data => {
+            const replyText = typeof data.reply === "string" ? data.reply : "AI 回覆錯誤";
+            outputDiv.textContent = replyText;
+        })
+        .catch(err => {
+            outputDiv.textContent = `發生錯誤: ${err.message}`;
+            console.error("AI 查詢錯誤", err);
+        })
+        .finally(() => {
+            sendBtn.disabled = false;
+            quickButtons.forEach(b => b.disabled = false); // 啟用所有按鈕
+        });
     }
 
     // draggable helper
