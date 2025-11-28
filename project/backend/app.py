@@ -43,7 +43,7 @@ def ask():
             headers={"Authorization": f"Bearer {GROQ_API_KEY}"},
             json={
                 "model": "llama-3.1-8b-instant",
-                "messages": [{"role": "user", "content": messages}]
+                "messages": messages
             },
             timeout=20
         )
