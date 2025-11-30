@@ -13,16 +13,21 @@ chrome.storage.local.get(["keyCount", "backspaceCount", "keyTimestamps"], (data)
   backspaceCount = data.backspaceCount || 0;
   keyTimestamps = data.keyTimestamps || []; 
   if(keyTimestamps.length > 0){
-      if(Date.now() - keyTimestamps.at(-1) > 14400000){ //4hr沒打字就重置(長期專注度記錄再另外放在後端)
+      if(Date.now() - keyTimestamps.at(-1) > 14400000){ //14400000 ms = 4hr沒打字就重置(長期專注度記錄再另外放在後端)
       keyTimestamps = [];
       keyCount = 0;
       backspaceCount = 0;
     }
   }
-  document.addEventListener("keydown", (e) =>{
-    keyCount++;
-    keyTimestamps.push(Date.now()); 
-    if (e.key === "Backspace") backspaceCount++;
+  document.addEventListener("keydown", (e) =>{ //監聽是否按按鍵
+
+    if (e.key === "Backspace") {
+      backspaceCount++;
+    }
+    else{ //刪字不算在打字裡面
+      keyCount++;
+      keyTimestamps.push(Date.now()); 
+    }
     chrome.storage.local.set({keyCount, backspaceCount, keyTimestamps});
   });
 });
