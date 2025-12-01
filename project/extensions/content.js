@@ -32,7 +32,7 @@ chrome.storage.local.get(["keyCount", "backspaceCount", "keyTimestamps"], (data)
   });
 });
 
-// Simple, robust content script for testing and modal UI
+
 if (window.__FOCUSTYPING_LOADED__) {
   console.log("[FocusTyping] already loaded");
 } else {
@@ -41,19 +41,8 @@ if (window.__FOCUSTYPING_LOADED__) {
   (function () {
     console.log("[FocusTyping] content.js start");
 
-    // global safe wrapper for storage
-    function safeStorageSet(obj) {
-      try {
-        chrome.storage.local.set(obj);
-      } catch (e) {
-        console.warn("[FocusTyping] storage.set failed:", e && e.message);
-      }
-    }
-
-
-    // ---------- Modal UI (simple, draggable) ----------
+    // ---------- Modal UI ----------
     let aiModal = null, inputArea = null, outputDiv = null, sendBtn = null, closeBtn = null;
-    // let currentSelectedText = "";
 
     function createModal(initialText) {
       if (aiModal) return; // already
@@ -75,7 +64,7 @@ if (window.__FOCUSTYPING_LOADED__) {
       closeBtn = document.createElement("button"); closeBtn.textContent = "✕"; closeBtn.style.border="none"; closeBtn.style.background="none"; closeBtn.style.cursor="pointer";
       header.appendChild(title); header.appendChild(closeBtn);
 
-      // ⚡ 新增：快捷按鈕容器
+      // 快捷按鈕容器
       const quickButtonsDiv = document.createElement("div");
       quickButtonsDiv.style.cssText = "display:flex; justify-content:space-between; margin-top:8px; margin-bottom:10px;";
 
@@ -136,7 +125,7 @@ if (window.__FOCUSTYPING_LOADED__) {
         })
         .finally(()=> sendBtn.disabled = false);
       });
-      // ⚡ 新增：快捷按鈕監聽器
+      // 快捷按鈕專門的監聽器
       quickButtonsDiv.querySelectorAll('button').forEach(btn => {
           btn.addEventListener('click', () => {
               const action = btn.getAttribute('data-action');
@@ -156,10 +145,11 @@ if (window.__FOCUSTYPING_LOADED__) {
       });
       makeDraggable(aiModal, header);
 
-      // fill initial
+      // 把反白文字放入
       if (initialText) inputArea.value = initialText;
     }
-    // ⚡ 輔助函式：用於處理快捷按鈕的 Fetch 請求 (放在 createModal 外部)
+
+    // 輔助函式：用於處理快捷按鈕的 Fetch 請求
     function autoFetchAI(fullTextForAI) {
         // 設置狀態
         outputDiv.textContent = "AI 正在思考中...";
@@ -238,8 +228,6 @@ if (window.__FOCUSTYPING_LOADED__) {
         if (outputDiv) outputDiv.textContent = "請編輯問題後按「詢問 AI」";
       }
     }
-
-    // quick test: log alive
     console.log("[FocusTyping] ready");
   })();
 }
