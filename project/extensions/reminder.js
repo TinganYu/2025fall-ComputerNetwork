@@ -1,5 +1,6 @@
 const floatingWindow = document.createElement('div');
 floatingWindow.id = 'reminder-window';
+floatingWindow.style.display = "flex";
 
 floatingWindow.style.cssText = `
     position: fixed;
@@ -33,6 +34,7 @@ document.body.appendChild(floatingWindow);
 
 const overlay = document.createElement('div');
 overlay.id = 'floating-overlay';
+overlay.style.display = "flex";
 
 overlay.style.cssText = `
     position: fixed;

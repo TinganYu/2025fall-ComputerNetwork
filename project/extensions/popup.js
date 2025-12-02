@@ -26,8 +26,6 @@ function openReminder(){    //開啟專注度低跳提醒
     });
 }
 
-openReminder();
-
 //打字相關資訊呈現
 chrome.storage.local.get(["keyCount", "backspaceCount", "keyTimestamps"], (data) => {
     const keyCount = data.keyCount || 0;
