@@ -28,3 +28,12 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     });
   }
 });
+
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg && msg.action === "openReminder") {
+    chrome.scripting.executeScript({
+      target: { tabId: msg.tab.id, allFrames: true },
+      files: ["reminder.js"]
+    });
+  }
+});

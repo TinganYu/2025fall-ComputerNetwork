@@ -19,6 +19,15 @@ function calculate_focus(){
     //指標：打字速度變化率、停頓時間、錯字率(backspaceCount/(backspaceCount+keyCount))
 }
 
+function openReminder(){    //開啟專注度低跳提醒
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        let tab = tabs[0];
+        chrome.runtime.sendMessage({ action: "openReminder" ,tab: tab});
+    });
+}
+
+openReminder();
+
 //打字相關資訊呈現
 chrome.storage.local.get(["keyCount", "backspaceCount", "keyTimestamps"], (data) => {
     const keyCount = data.keyCount || 0;

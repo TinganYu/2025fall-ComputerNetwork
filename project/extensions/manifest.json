@@ -15,7 +15,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"],
+      "js": ["content.js", "reminder.js"],
       "run_at": "document_idle",
       "all_frames": true
     }
