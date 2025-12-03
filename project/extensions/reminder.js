@@ -1,6 +1,6 @@
 const floatingWindow = document.createElement('div');
 floatingWindow.id = 'reminder-window';
-floatingWindow.style.display = "flex";
+floatingWindow.style.display = "block";
 
 floatingWindow.style.cssText = `
     position: fixed;
@@ -34,7 +34,7 @@ document.body.appendChild(floatingWindow);
 
 const overlay = document.createElement('div');
 overlay.id = 'floating-overlay';
-overlay.style.display = "flex";
+overlay.style.display = "block";
 
 overlay.style.cssText = `
     position: fixed;
@@ -56,4 +56,11 @@ closeBtn.addEventListener("click", () => {
     }
     floatingWindow.style.display = "none";
     overlay.style.display = "none";
+});
+
+chrome.runtime.onMessage.addListener((msg) => {
+    if (msg && msg.action === "showWindow") {
+        floatingWindow.style.display = "block";
+        overlay.style.display = "block";
+    }
 });

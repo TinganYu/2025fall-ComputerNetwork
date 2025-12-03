@@ -29,11 +29,18 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
+let executing = false;
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg && msg.action === "openReminder") {
-    chrome.scripting.executeScript({
-      target: { tabId: msg.tab.id, allFrames: true },
-      files: ["reminder.js"]
-    });
+    if(!executing){
+      chrome.scripting.executeScript({
+        target: { tabId: msg.tab.id, allFrames: true },
+        files: ["reminder.js"]
+      });
+      executing = true;
+    }
+    else{
+      chrome.tabs.sendMessage(msg.tab.id, {action: "showWindow"});
+    }
   }
 });
