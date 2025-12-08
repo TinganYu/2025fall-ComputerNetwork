@@ -30,3 +30,14 @@ def select():
             cur.execute(command, (None,))
             rows = cur.fetchall()
     return
+
+@app.route("/check_id", methods=["POST"])
+def select():
+    with psycopg2.connect(DB_URL) as conn:
+        with conn.cursor() as cur:
+            data = request.json
+            command = "SELECT * FROM your_table WHERE user_id = %s"
+            cur.execute(command, (None,))
+            rows = cur.fetchall()
+            
+    return

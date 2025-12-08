@@ -4,7 +4,15 @@ chrome.runtime.onInstalled.addListener(() => {
     title: "送給 AI",
     contexts: ["selection"]
   });
+  chrome.storage.local.get(["user_id"], (data) => {
+    if (!data.user_id) {
+      const uid = crypto.randomUUID();
+      chrome.storage.local.set({ user_id: uid });
+      console.log("Assigned new user ID:", uid);
+    }
+  });
 });
+
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "askAI" && info.selectionText) {
@@ -29,18 +37,15 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
-let executing = false;
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg && msg.action === "openReminder") {
-    if(!executing){
-      chrome.scripting.executeScript({
-        target: { tabId: msg.tab.id, allFrames: true },
-        files: ["reminder.js"]
+    chrome.tabs.sendMessage(msg.tab.id, {action: "showWindow"},
+      (response) => {
+        if(chrome.runtime.lastError)
+          chrome.scripting.executeScript({
+            target: { tabId: msg.tab.id, allFrames: true },
+            files: ["reminder.js"]
+          });
       });
-      executing = true;
-    }
-    else{
-      chrome.tabs.sendMessage(msg.tab.id, {action: "showWindow"});
-    }
   }
 });

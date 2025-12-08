@@ -1,32 +1,38 @@
 const floatingWindow = document.createElement('div');
+const shadow = floatingWindow.attachShadow({ mode: "open" });
 floatingWindow.id = 'reminder-window';
 floatingWindow.style.display = "block";
 
-floatingWindow.style.cssText = `
-    position: fixed;
-    width: 250px;
-    padding: 10px;
-    top: calc(50% - 50px);
-    left: calc(50% - 125px);
-    font-family: sans-serif;
-    background: white;
-    border: 1px solid #ddd;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    z-index: 999999;
-`;
+shadow.innerHTML = `
+    <style>
+        #main {
+            all: initial;
+            position: fixed;
+            width: 250px;
+            padding: 10px;
+            top: calc(50% - 50px);
+            left: calc(50% - 125px);
+            font-family: sans-serif;
+            background: white;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            z-index: 999999;
+        }
+    </style>
 
-floatingWindow.innerHTML = `
-    <button id="closeWindow" style="
-            position: absolute; top: 3px; right: 3px;
-            border: none; background: none; font-size: 16px; cursor: pointer; color: #666666;
-        ">✕</button>
-    <div style="text-align:center ;margin:0 0 10px 0; text-align: center; font-size:20px; font-weight: bold;">
-        <label>噢！你似乎有點分心囉</label><br>
-        <label>休息一下，繼續努力！</label><br>
-    </div>
-    <div style="text-align: center; padding-left: -10px;">
-        <input type="checkbox" id="user_response" style="position: relative; transform: translate(-50%, 25.5%);"/>
-        <label for="user_response" style="font-size:12px; color: #666666; margin-left: -5px;">沒有分心嗎？點擊勾選以回報</label>
+    <div id="main">
+        <button id="closeWindow" style="
+                position: absolute; top: 3px; right: 3px;
+                border: none; background: none; font-size: 16px; cursor: pointer; color: #666666;
+            ">✕</button>
+        <div style="text-align:center ;margin:0 0 10px 0; text-align: center; font-size:20px; font-weight: bold;">
+            <label>噢！你似乎有點分心囉</label><br>
+            <label>休息一下，繼續努力！</label><br>
+        </div>
+        <div style="text-align: center; padding-left: -10px;">
+            <input type="checkbox" id="user_response" style="position: relative; transform: translate(-50%, 25.5%);"/>
+            <label for="user_response" style="font-size:12px; color: #666666; margin-left: -5px;">沒有分心嗎？點擊勾選以回報</label>
+        </div>
     </div>
 `;
 
@@ -48,11 +54,12 @@ overlay.style.cssText = `
 
 document.body.appendChild(overlay);
 
-const closeBtn = floatingWindow.querySelector("#closeWindow");
+const closeBtn = shadow.querySelector("#closeWindow");
 closeBtn.addEventListener("click", () => {
-    const UserCbox = floatingWindow.querySelector("#user_response");
+    const UserCbox = shadow.querySelector("#user_response");
     if(UserCbox.checked){
         // 紀錄User沒有不專注
+        UserCbox.checked = false;
     }
     floatingWindow.style.display = "none";
     overlay.style.display = "none";
@@ -62,5 +69,7 @@ chrome.runtime.onMessage.addListener((msg) => {
     if (msg && msg.action === "showWindow") {
         floatingWindow.style.display = "block";
         overlay.style.display = "block";
+        const exists = true;
+        sendResponse({ exists });
     }
 });
