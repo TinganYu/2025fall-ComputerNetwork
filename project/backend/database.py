@@ -38,6 +38,6 @@ def select():
             data = request.json
             command = "SELECT * FROM your_table WHERE user_id = %s"
             cur.execute(command, (None,))
-            rows = cur.fetchall()
+            rows = cur.fetchone()
             
     return

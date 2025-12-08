@@ -4,12 +4,15 @@ chrome.runtime.onInstalled.addListener(() => {
     title: "送給 AI",
     contexts: ["selection"]
   });
-  chrome.storage.local.get(["user_id"], (data) => {
+  chrome.storage.sync.get(["user_id"], (data) => {  //sync: 透過chrome同步功能同步
     if (!data.user_id) {
       const uid = crypto.randomUUID();
-      chrome.storage.local.set({ user_id: uid });
+      // 確認id沒有重複: db
+      chrome.storage.sync.set({ user_id: uid });
       console.log("Assigned new user ID:", uid);
     }
+    else
+      console.log("User ID:", data.user_id)
   });
 });
 
