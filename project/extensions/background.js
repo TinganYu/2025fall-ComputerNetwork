@@ -20,7 +20,7 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 
   chrome.alarms.create("focusScoreAlarm", { 
-    periodInMinutes: 10 // 每10分鐘更新一次專注度
+    periodInMinutes: 5 // 每5分鐘更新一次專注度
   });
 });
 
