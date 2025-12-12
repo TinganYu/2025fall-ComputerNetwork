@@ -37,8 +37,6 @@ chrome.storage.local.get(["keyCount", "backspaceCount", "keyTimestamps"], (data)
 });
 
 
-
-
 // ---------- AI Modal part ----------
 
 if (window.__FOCUSTYPING_LOADED__) {
@@ -48,7 +46,7 @@ if (window.__FOCUSTYPING_LOADED__) {
 
   (function () {
     console.log("[FocusTyping] content.js start");
-    
+
     let modalShown = false;
     function createAndShow(initialText) {  //生出頁面
       if (!aiModal) createModal(initialText);
@@ -63,6 +61,7 @@ if (window.__FOCUSTYPING_LOADED__) {
     }
 
     // ---------- Modal UI ----------
+    let container = null, shadow = null;
     let aiModal = null, inputArea = null, outputDiv = null, sendBtn = null, closeBtn = null;
 
     function createModal(initialText) {
@@ -73,9 +72,38 @@ if (window.__FOCUSTYPING_LOADED__) {
         return;
       }
 
+      // 建立 container 與 shadow root
+      container = document.createElement("div");
+      container.id = "ft-ai-container";
+      shadow = container.attachShadow({ mode: "open" });
+      document.body.appendChild(container);
+
+      // style 隔離字體
+      const style = document.createElement("style");
+      style.textContent = `
+        #ft-ai-modal {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          width: 360px;
+          background: #fff;
+          border: 1px solid #ddd;
+          padding: 10px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+          z-index: 9999999;
+          border-radius: 6px;
+          font-family: "Noto Sans TC", sans-serif;
+        }
+        #ft-ai-modal button { font-family: inherit; }
+        #ft-ai-modal textarea { font-family: inherit; }
+        #ft-ai-modal div { font-family: inherit; }
+      `;
+      shadow.appendChild(style);
+
+      // main modal
       aiModal = document.createElement("div");
       aiModal.id = "ft-ai-modal";
-      aiModal.style.cssText = "position:fixed;bottom:20px;right:20px;width:360px;background:#fff;border:1px solid #ddd;padding:10px;box-shadow:0 4px 12px rgba(0,0,0,0.12);z-index:9999999;border-radius:6px;display:none;";
+      aiModal.style.display = "none";
 
       // header (drag)
       const header = document.createElement("div");
@@ -118,7 +146,7 @@ if (window.__FOCUSTYPING_LOADED__) {
       aiModal.appendChild(inputArea);
       aiModal.appendChild(sendBtn);
       aiModal.appendChild(outputDiv);
-      document.body.appendChild(aiModal);
+      shadow.appendChild(aiModal);
 
       // handlers
       closeBtn.addEventListener("click", () => {aiModal.style.display = "none"; modalShown = false;});
@@ -145,6 +173,7 @@ if (window.__FOCUSTYPING_LOADED__) {
         })
         .finally(()=> sendBtn.disabled = false);
       });
+
       // 快捷按鈕專門的監聽器
       quickButtonsDiv.querySelectorAll('button').forEach(btn => {
           btn.addEventListener('click', () => {
@@ -163,6 +192,7 @@ if (window.__FOCUSTYPING_LOADED__) {
               autoFetchAI(fullTextForAI);
           });
       });
+
       makeDraggable(aiModal, header);
 
       // 把反白文字放入
@@ -227,30 +257,15 @@ if (window.__FOCUSTYPING_LOADED__) {
       }
     }
 
-    // // background -> content message 呼叫
-    // chrome.runtime.onMessage.addListener((msg) => {
-    //   if (msg && msg.action === "showAIWindow") {
-    //     try {
-    //       createAndShow(msg.text || "");
-    //     } catch (e) {
-    //       console.error("[FocusTyping] show error", e);
-    //     }
-    //   }
-    // });
     chrome.runtime.onMessage.addListener((msg) => {
-      if (msg &&msg.action === "showAIWindow") {
-        
-        // 情況 1: 如果是在 iframe 中
+      if (msg && msg.action === "showAIWindow") {
         if (window !== window.top) {
-          // → 把訊息丟給 top frame，讓最上層決定要顯示 UI
           window.top.postMessage({
             action: "showAIWindow-forward",
             text: msg.text || ""
           }, "*");
-          return; // iframe 不做 createAndShow()
+          return;
         }
-
-        // 情況 2: 如果是在 top frame
         createAndShow(msg.text || "");
       }    
     });
@@ -260,8 +275,7 @@ if (window.__FOCUSTYPING_LOADED__) {
         createAndShow(event.data.text || "");
       }
     });
+
     console.log("[FocusTyping] ready");
   })();
 };
-
-
