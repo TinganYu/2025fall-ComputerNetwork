@@ -57,10 +57,14 @@ document.body.appendChild(overlay);
 const closeBtn = shadow.querySelector("#closeWindow");
 closeBtn.addEventListener("click", () => {
     const UserCbox = shadow.querySelector("#user_response");
+
     if(UserCbox.checked){
-        // 紀錄User沒有不專注
+        chrome.storage.sync.get(["bias"], (data) => {
+            chrome.storage.sync.set({ bias: data.bias + 1/*bias增加量待確認*/});
+        });
         UserCbox.checked = false;
     }
+
     floatingWindow.style.display = "none";
     overlay.style.display = "none";
 });
