@@ -40,6 +40,7 @@ chrome.storage.local.get(["keyCount", "backspaceCount", "keyTimestamps"], (data)
 
 
 // ---------- AI Modal part ----------
+
 if (window.__FOCUSTYPING_LOADED__) {
   console.log("[FocusTyping] already loaded");
 } else {
@@ -47,13 +48,25 @@ if (window.__FOCUSTYPING_LOADED__) {
 
   (function () {
     console.log("[FocusTyping] content.js start");
+    
+    let modalShown = false;
+    function createAndShow(initialText) {  //生出頁面
+      if (!aiModal) createModal(initialText);
+      else if (inputArea) inputArea.value = initialText || "";
+      if (modalShown) return;   // 防止重複
+      modalShown = true;
+      if (aiModal) {
+        aiModal.style.display = "block";
+        if (inputArea && (!inputArea.value || inputArea.value.trim() === "")) inputArea.value = initialText || "";
+        if (outputDiv) outputDiv.textContent = "請編輯問題後按「詢問 AI」";
+      }
+    }
 
     // ---------- Modal UI ----------
     let aiModal = null, inputArea = null, outputDiv = null, sendBtn = null, closeBtn = null;
 
     function createModal(initialText) {
       if (aiModal) return; // already
-      // basic DOM ready guard
       if (!document.body) {
         console.warn("[FocusTyping] document.body not ready - retry shortly");
         setTimeout(() => createModal(initialText), 100);
@@ -108,7 +121,7 @@ if (window.__FOCUSTYPING_LOADED__) {
       document.body.appendChild(aiModal);
 
       // handlers
-      closeBtn.addEventListener("click", () => aiModal.style.display = "none");
+      closeBtn.addEventListener("click", () => {aiModal.style.display = "none"; modalShown = false;});
       sendBtn.addEventListener("click", () => {
         const currentSelectedText = inputArea.value.trim();
         if (!currentSelectedText) { outputDiv.textContent = "請輸入問題"; return; }
@@ -186,7 +199,7 @@ if (window.__FOCUSTYPING_LOADED__) {
         });
     }
 
-    // draggable helper
+    // 讓他可以拖曳的輔助功能
     function makeDraggable(el, handle) {
       let down = false, sx=0, sy=0, left=0, top=0;
       handle.addEventListener("mousedown", (e) => {
@@ -214,27 +227,41 @@ if (window.__FOCUSTYPING_LOADED__) {
       }
     }
 
-    // background -> content message
+    // // background -> content message 呼叫
+    // chrome.runtime.onMessage.addListener((msg) => {
+    //   if (msg && msg.action === "showAIWindow") {
+    //     try {
+    //       createAndShow(msg.text || "");
+    //     } catch (e) {
+    //       console.error("[FocusTyping] show error", e);
+    //     }
+    //   }
+    // });
     chrome.runtime.onMessage.addListener((msg) => {
-      if (msg && msg.action === "showAIWindow") {
-        // ensure modal exists and show
-        try {
-          createAndShow(msg.text || "");
-        } catch (e) {
-          console.error("[FocusTyping] show error", e);
+      if (msg &&msg.action === "showAIWindow") {
+        
+        // 情況 1: 如果是在 iframe 中
+        if (window !== window.top) {
+          // → 把訊息丟給 top frame，讓最上層決定要顯示 UI
+          window.top.postMessage({
+            action: "showAIWindow-forward",
+            text: msg.text || ""
+          }, "*");
+          return; // iframe 不做 createAndShow()
         }
+
+        // 情況 2: 如果是在 top frame
+        createAndShow(msg.text || "");
+      }    
+    });
+    window.addEventListener("message", (event) => {
+      if (event.data?.action === "showAIWindow-forward") {
+        console.log("[Forward] Received in top frame");
+        createAndShow(event.data.text || "");
       }
     });
-
-    function createAndShow(initialText) {
-      if (!aiModal) createModal(initialText);
-      else if (inputArea) inputArea.value = initialText || "";
-      if (aiModal) {
-        aiModal.style.display = "block";
-        if (inputArea && (!inputArea.value || inputArea.value.trim() === "")) inputArea.value = initialText || "";
-        if (outputDiv) outputDiv.textContent = "請編輯問題後按「詢問 AI」";
-      }
-    }
     console.log("[FocusTyping] ready");
   })();
-}
+};
+
+
