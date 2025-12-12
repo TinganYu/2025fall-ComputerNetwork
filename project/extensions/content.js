@@ -23,6 +23,7 @@ chrome.storage.local.get(["keyCount", "backspaceCount", "keyTimestamps"], (data)
   }
   */
   document.addEventListener("keydown", (e) =>{ //監聽是否按按鍵
+
     if (e.key === "Backspace") {
       backspaceCount++;
       //keyTimestamps.push(Date.now()); 
@@ -35,7 +36,7 @@ chrome.storage.local.get(["keyCount", "backspaceCount", "keyTimestamps"], (data)
   });
 });
 
-// ---------- 日週回顧 part ----------
+
 
 
 // ---------- AI Modal part ----------

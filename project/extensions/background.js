@@ -1,3 +1,7 @@
+function cal_start(nowtime){
+  return Math.ceil(nowtime / CALCULATE_INTERVAL) * CALCULATE_INTERVAL;
+}
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "askAI",
@@ -20,6 +24,7 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 
   chrome.alarms.create("focusScoreAlarm", { 
+    when: cal_start(Date.now()),
     periodInMinutes: 10 // 每10分鐘更新一次專注度
   });
 });
@@ -32,6 +37,7 @@ function calculate_focus(data){
 //監聽專注度鬧鐘
 
 chrome.alarms.onAlarm.addListener((alarm) => {
+    //console.log(Date());
     if (alarm.name === "focusScoreAlarm") {
         chrome.storage.local.get(["keyCount", "backspaceCount", "keyTimestamps", "last_focus_score", "LAST_CALCULATE_FOCUS"], (data) => {
           const keyTimestamps = data.keyTimestamps || [];
@@ -46,6 +52,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
                   LAST_CALCULATE_FOCUS: Date.now() // 更新上次計算時間
               }, () => {
                  // TODO //後端上傳
+                 // 傳focus + Date.now() + user_id
               });
           }
         });

@@ -61,6 +61,7 @@ closeBtn.addEventListener("click", () => {
     if(UserCbox.checked){
         chrome.storage.sync.get(["bias"], (data) => {
             chrome.storage.sync.set({ bias: data.bias + 1/*bias增加量待確認*/});
+            //db update bias
         });
         UserCbox.checked = false;
     }
