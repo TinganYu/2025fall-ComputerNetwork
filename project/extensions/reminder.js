@@ -83,7 +83,8 @@ if (window.__FOCUS_FLOATING_WINDOW_INIT__) {
         const userCbox = reminderContainer.querySelector("#user_response");
         if (userCbox?.checked) {
             chrome.storage.sync.get(["bias"], (data) => {
-                chrome.storage.sync.set({ bias: (data.bias || 0) + 1 });
+                chrome.storage.sync.set({ bias: (data.bias || 0) + 1 });    //增加量待調整?
+                //database update bias
             });
         }
         showRecoveryMenu();
