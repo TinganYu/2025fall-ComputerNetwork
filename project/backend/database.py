@@ -54,3 +54,21 @@ def check_id():
                     return jsonify({"exists": False, "bias": 0})
     except:
         return jsonify({"error": "Database error"}), 500
+    
+@app.route("/update_bias", methods=["POST"])
+def update_bias():
+    data = request.json
+    id = data.get("id", "")
+    new_bias = data.get("bias", "")
+    if new_bias == "" or id == "":
+        return jsonify({"error": "Request error"}), 400
+    
+    try:
+        with psycopg2.connect(DB_URL) as conn:
+            with conn.cursor() as cur:
+                command = "UPDATE users SET bias = %s WHERE id = %s"
+                cur.execute(command, (new_bias,id))
+                conn.commit()
+                return jsonify({"log": "update success"})
+    except:
+        return jsonify({"error": "Database error"}), 500
