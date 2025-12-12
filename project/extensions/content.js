@@ -12,17 +12,20 @@ chrome.storage.local.get(["keyCount", "backspaceCount", "keyTimestamps"], (data)
   keyCount = data.keyCount || 0;
   backspaceCount = data.backspaceCount || 0;
   keyTimestamps = data.keyTimestamps || []; 
-  if(keyTimestamps.length > 0){
-      if(Date.now() - keyTimestamps.at(-1) > 14400000){ //14400000 ms = 4hr沒打字就重置(長期專注度記錄再另外放在後端)
+  /* 超時歸零功能有問題，先不做了
+  if(keyTimestamps.length >= 2){
+    if(Date.now() - keyTimestamps.at(-1) > 10000){ //14400000 ms = 4hr沒打字就重置(長期專注度記錄再另外放在後端)
       keyTimestamps = [];
       keyCount = 0;
       backspaceCount = 0;
+      chrome.storage.local.set({keyCount, backspaceCount, keyTimestamps});
     }
   }
+  */
   document.addEventListener("keydown", (e) =>{ //監聽是否按按鍵
-
     if (e.key === "Backspace") {
       backspaceCount++;
+      //keyTimestamps.push(Date.now()); 
     }
     else{ //刪字不算在打字裡面
       keyCount++;
