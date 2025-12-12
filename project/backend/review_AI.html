@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>專注度回顧</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        h2 {
+            text-align: center;
+        }
+        .chart-container {
+            width: 90%;
+            max-width: 900px;
+            margin: 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chart-container">
+        <h2>日回顧（半小時單位）</h2>
+        <canvas id="dailyChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>週回顧（過去七天平均專注度）</h2>
+        <canvas id="weeklyChart"></canvas>
+    </div>
+
+    <script>
+        // ===== 模擬資料 =====
+        // 日回顧（24小時，每半小時一個點 → 48個點）
+        const dailyLabels = [];
+        const dailyData = [];
+        for (let i = 0; i < 48; i++) {
+            const hour = Math.floor(i / 2);
+            const minute = i % 2 === 0 ? '00' : '30';
+            dailyLabels.push(`${hour}:${minute}`);
+            dailyData.push(Math.floor(Math.random() * 101)); // 0~100 專注度
+        }
+
+        // 週回顧（過去七天）
+        const weeklyLabels = [];
+        const weeklyData = [];
+        const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            weeklyLabels.push(`${d.getMonth()+1}/${d.getDate()} (${weekdays[d.getDay()]})`);
+            weeklyData.push(Math.floor(Math.random() * 101)); // 0~100
+        }
+
+        // ===== 日回顧圖表 =====
+        const ctxDaily = document.getElementById('dailyChart').getContext('2d');
+        new Chart(ctxDaily, {
+            type: 'line',
+            data: {
+                labels: dailyLabels,
+                datasets: [{
+                    label: '專注度',
+                    data: dailyData,
+                    fill: true,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: '時間 (每30分鐘)'
+                        }
+                    },
+                    y: {
+                        min: 0,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: '專注度 (%)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                }
+            }
+        });
+
+        // ===== 週回顧圖表 =====
+        const ctxWeekly = document.getElementById('weeklyChart').getContext('2d');
+        new Chart(ctxWeekly, {
+            type: 'bar',
+            data: {
+                labels: weeklyLabels,
+                datasets: [{
+                    label: '平均專注度',
+                    data: weeklyData,
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: '日期'
+                        }
+                    },
+                    y: {
+                        min: 0,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: '平均專注度 (%)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

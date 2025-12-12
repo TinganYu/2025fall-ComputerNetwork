@@ -9,10 +9,14 @@ chrome.runtime.onInstalled.addListener(() => {
       const uid = crypto.randomUUID();
       // 確認id沒有重複: db
       chrome.storage.sync.set({ user_id: uid });
+      chrome.storage.sync.set({ bias: 0 });
       console.log("Assigned new user ID:", uid);
     }
     else
-      console.log("User ID:", data.user_id)
+    {
+      console.log("User ID:", data.user_id);
+      chrome.storage.sync.set({ bias: /*從db抓*/0 });
+    }
   });
 });
 

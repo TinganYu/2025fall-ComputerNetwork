@@ -32,7 +32,10 @@ chrome.storage.local.get(["keyCount", "backspaceCount", "keyTimestamps"], (data)
   });
 });
 
+// ---------- 日週回顧 part ----------
 
+
+// ---------- AI Modal part ----------
 if (window.__FOCUSTYPING_LOADED__) {
   console.log("[FocusTyping] already loaded");
 } else {
