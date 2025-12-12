@@ -3,7 +3,7 @@
   "name": "FocusTyping",
   "version": "1.0",
   "description": "智慧專注寫作助手",
-  "permissions": ["activeTab", "scripting", "contextMenus","storage"],
+  "permissions": ["activeTab", "scripting", "contextMenus","storage", "alarms"],
   "host_permissions":["https://two025fall-computernetwork.onrender.com/*"],
   "action": {
     "default_popup": "popup.html",
