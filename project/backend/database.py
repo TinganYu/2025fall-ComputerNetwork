@@ -39,7 +39,7 @@ def update_focus():
                     command = "INSERT INTO daily (id, Timestamps, focus, merge) VALUES (%s, %s, %s, %s)"
                     cur.execute(command, (user_id,now_ms,focus,1))
                 conn.commit()
-            # 推到 weekly 跟刪掉日回顧 可以用trigger?
+            # 推到 weekly 跟刪掉日回顧 可以用trigger? 加了待測試
         return jsonify({"log": "update focus success"})
     except:
         return jsonify({"error": "Database error"}), 500
