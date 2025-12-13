@@ -38,27 +38,10 @@
     </div>
 
     <script>
-        // ===== 模擬資料 =====
-        // 日回顧（24小時，每半小時一個點 → 48個點）
-        const dailyLabels = [];
-        const dailyData = [];
-        for (let i = 0; i < 48; i++) {
-            const hour = Math.floor(i / 2);
-            const minute = i % 2 === 0 ? '00' : '30';
-            dailyLabels.push(`${hour}:${minute}`);
-            dailyData.push(Math.floor(Math.random() * 101)); // 0~100 專注度
-        }
-
-        // 週回顧（過去七天）
-        const weeklyLabels = [];
-        const weeklyData = [];
-        const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
-        for (let i = 6; i >= 0; i--) {
-            const d = new Date();
-            d.setDate(d.getDate() - i);
-            weeklyLabels.push(`${d.getMonth()+1}/${d.getDate()} (${weekdays[d.getDay()]})`);
-            weeklyData.push(Math.floor(Math.random() * 101)); // 0~100
-        }
+        const dailyLabels = {{ dailyLabels|tojson }};
+        const dailyData = {{ dailyData|tojson }};
+        const weeklyLabels = {{ weeklyLabels|tojson }};
+        const weeklyData = {{ weeklyData|tojson }};
 
         // ===== 日回顧圖表 =====
         const ctxDaily = document.getElementById('dailyChart').getContext('2d');
