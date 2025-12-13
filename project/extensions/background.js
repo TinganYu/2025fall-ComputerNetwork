@@ -12,6 +12,10 @@ chrome.runtime.onInstalled.addListener(() => {
     title: "送給 AI",
     contexts: ["selection"]
   });
+  chrome.contextMenus.create({
+    id: "review",
+    title: "查看回顧"
+  });
   chrome.storage.sync.get(["user_id"], (data) => {  //sync: 透過chrome同步功能同步
     if (!data.user_id) {
         (async () => {  //確認不是重複uid
@@ -241,7 +245,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
             
             const LAST_CALCULATE_FOCUS = data.LAST_CALCULATE_FOCUS || 0;
             let history = data.focus_history || []; 
-
+            console.log("確認週期");
             // 檢查是否已達到計算週期(過了10分鐘)
             if ((Date.now() - LAST_CALCULATE_FOCUS) >= FOCUS_INTERVAL_MS) {
 
@@ -339,6 +343,9 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
         });
       });
     });
+  }
+  else if (info.menuItemId === "review"){
+    
   }
 });
 

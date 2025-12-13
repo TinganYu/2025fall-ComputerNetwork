@@ -22,6 +22,7 @@ from datetime import datetime, timezone
 def update_focus():
     data = request.json
     now_ms = data.get("now", "")
+    now_ms -= 1000  # 避免延遲影響計算
     print("time:",datetime.fromtimestamp(now_ms / 1000, tz=timezone.utc))
     now_ms = math.ceil(now_ms / (1000 * 60 * 30))
     print("ms:",now_ms)
@@ -50,12 +51,16 @@ def update_focus():
     
 @app.route("/show_review", methods=["POST"])
 def show_review():
-    with psycopg2.connect(DB_URL) as conn:
-        with conn.cursor() as cur:
-            data = request.json
-            command = "SELECT * FROM your_table WHERE user_id = %s"
-            cur.execute(command, (None,))
-            rows = cur.fetchall()
+    try:
+        with psycopg2.connect(DB_URL) as conn:
+            with conn.cursor() as cur:
+                data = request.json
+                command = "SELECT * FROM your_table WHERE user_id = %s"
+                cur.execute(command, (None,))
+                rows = cur.fetchall()
+    except Exception as e:
+        print("Database error:", e)
+        return jsonify({"error": "Database error"}), 500
     return
 
 @app.route("/check_id", methods=["POST"])
