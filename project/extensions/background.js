@@ -130,8 +130,8 @@ function calculate_focus(data){
     const sectionSpeeds = calculateSectionalVelocity(keyTimestamps); 
     const Delta_v = calculateDeltaV(sectionSpeeds);
 
-    
 
+    let focusScore=1 //還沒寫完，先寫這個避免出bug
 
     return focusScore
 };
