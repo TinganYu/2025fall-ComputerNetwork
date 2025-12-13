@@ -94,7 +94,7 @@ def update_bias():
                 command = "UPDATE users SET bias = %s WHERE id = %s"
                 cur.execute(command, (new_bias,user_id))
                 conn.commit()
-        return jsonify({"log": "update bias success"})
+        return jsonify({"log": "update bias success"}),200
     except:
         return jsonify({"error": "Database error"}), 500
     

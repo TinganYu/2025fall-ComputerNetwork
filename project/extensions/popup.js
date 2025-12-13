@@ -37,4 +37,10 @@ function updateDisplay() {
 }
 
 updateDisplay();
-//openReminder();
+function openReminder(){
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        let tab = tabs[0];
+        chrome.runtime.sendMessage({ action: "openReminder" ,tab: tab});
+    });
+}
+openReminder();

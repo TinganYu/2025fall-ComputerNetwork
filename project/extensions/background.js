@@ -34,7 +34,7 @@ chrome.runtime.onInstalled.addListener(() => {
         console.log("Assigned new user ID:", uid);
       })();
     }
-    else
+    else  //以防萬一跟 db 同步 id + bias
     {
       console.log("User ID:", data.user_id);
       fetch("https://two025fall-computernetwork-aiv7.onrender.com/check_id", {
@@ -332,6 +332,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg && msg.action === "openReminder") {
+    //console.log("try to open reminder");
     chrome.tabs.sendMessage(msg.tab.id, {action: "showWindow"},
       (response) => {
         if(chrome.runtime.lastError)

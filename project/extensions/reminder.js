@@ -79,12 +79,23 @@ if (window.__FOCUS_FLOATING_WINDOW_INIT__) {
     shadow.appendChild(recoveryContainer);
 
     // 監聽
+    console.log("[Eileen's Part] update bias to db: ",reminderContainer.querySelector("#closeWindow"));
     reminderContainer.querySelector("#closeWindow").addEventListener("click", () => {
         const userCbox = reminderContainer.querySelector("#user_response");
+        console.log("[Eileen's Part] update bias to db: ",userCbox);
         if (userCbox?.checked) {
-            chrome.storage.sync.get(["bias"], (data) => {
+            chrome.storage.sync.get(["user_id","bias"], (data) => {
                 chrome.storage.sync.set({ bias: (data.bias || 0) + 1 });    //增加量待調整?
                 //database update bias
+                fetch("https://two025fall-computernetwork.onrender.com/update_bias", {
+                    method: "POST",
+                    headers: {"Content-Type":"application/json"},
+                    body: JSON.stringify({ id: data.user_id , bias: data.bias + 1 })
+                })
+                .then(r => r.json().catch(()=>{}))
+                .then(data => {
+                    console.log("[Eileen's Part] update bias to db: ",data);
+                });
             });
         }
         showRecoveryMenu();
