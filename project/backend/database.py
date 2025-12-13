@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import math
 from flask_cors import CORS
 import psycopg2
@@ -16,12 +16,15 @@ function calculate_date(timestamp){
   const days = Math.floor(timestamp / (1000 * 60 * 60 * 24));
   return days;
 }'''
+from datetime import datetime, timezone
 
 @app.route("/update_focus", methods=["POST"])
 def update_focus():
     data = request.json
     now_ms = data.get("now", "")
+    print("time:",datetime.fromtimestamp(now_ms / 1000, tz=timezone.utc))
     now_ms = math.ceil(now_ms / (1000 * 60 * 30))
+    print("ms:",now_ms)
     focus = data.get("focus", "")
     user_id = data.get("id", "")
     

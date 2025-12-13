@@ -280,14 +280,14 @@ chrome.alarms.onAlarm.addListener((alarm) => {
                 if (history.length > MAX_HISTORY_LENGTH) {
                     history = history.slice(history.length - MAX_HISTORY_LENGTH); //太長只留新的
                 }
-
+                console.log("準備呼叫db");
                 //存進chrome
                 chrome.storage.local.set({
                     last_focus_score: finalScore,
                     LAST_CALCULATE_FOCUS: Date.now(),
                     focus_history: history 
                 }, () => {
-                    if (finalScore < 20)    //待調整 專注力提醒
+                    if (finalScore < 40)    //待調整 專注力提醒
                         openReminder(); 
 
                     // 將 focus 存進 db
