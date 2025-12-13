@@ -41,7 +41,8 @@ def update_focus():
                 conn.commit()
             # 推到 weekly 跟刪掉日回顧 可以用trigger? 加了待測試
         return jsonify({"log": "update focus success"})
-    except:
+    except Exception as e:
+        print("Database error:", e)
         return jsonify({"error": "Database error"}), 500
     
 '''@app.route("/show_review", methods=["POST"])
@@ -59,7 +60,7 @@ def check_id():
     data = request.json
     check_id = data.get("id", "")
     if check_id == "":
-        return jsonify({"exists": True})
+        return jsonify({"error": "Request error"}), 400
     
     try:
         with psycopg2.connect(DB_URL) as conn:

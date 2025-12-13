@@ -14,16 +14,39 @@ chrome.runtime.onInstalled.addListener(() => {
   });
   chrome.storage.sync.get(["user_id"], (data) => {  //sync: 透過chrome同步功能同步
     if (!data.user_id) {
-      const uid = crypto.randomUUID();
-      // 確認id沒有重複: db
-      chrome.storage.sync.set({ user_id: uid });
-      chrome.storage.sync.set({ bias: 0 });
-      console.log("Assigned new user ID:", uid);
+      (async () => {  //確認不是重複uid
+        let uid_repeat = true;
+        let uid = crypto.randomUUID();
+        while(uid_repeat){
+          const response =  await fetch("https://two025fall-computernetwork-aiv7.onrender.com/check_id", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({ id: uid })
+          });
+          const result = await response.json();
+          if(!result.exists)
+            uid_repeat = false;
+          else
+            uid = crypto.randomUUID();
+        }
+        chrome.storage.sync.set({ user_id: uid });
+        chrome.storage.sync.set({ bias: 0 });
+        console.log("Assigned new user ID:", uid);
+      })();
     }
     else
     {
       console.log("User ID:", data.user_id);
-      chrome.storage.sync.set({ bias: /*從db抓*/0 });
+      fetch("https://two025fall-computernetwork-aiv7.onrender.com/check_id", {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({ id: data.user_id })
+      })
+      .then(r => r.json().catch(()=>{}))
+      .then(data => {
+        chrome.storage.sync.set({ bias: data.bias });
+        console.log("User bias:", data);
+      });
     }
   });
 
