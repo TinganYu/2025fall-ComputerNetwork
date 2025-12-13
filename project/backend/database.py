@@ -58,7 +58,7 @@ def show_review():
     now_day = math.floor((math.ceil(now_ms / (1000 * 60 * 30)) -1) / 48)
     user_id = request.args.get('id')
     if not user_id or not now_ms:
-        print(data)
+        print(request)
         return jsonify({"error": "Request error"}), 400
     
     try:
