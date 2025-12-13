@@ -148,6 +148,7 @@ function calculateDeltaV(v) {
     return averageChangeRate; 
 }
 
+//計算當前專注度的三個指標
 function calculate_focus(data, lastCalcTime){
     //指標：打字速度變化率、停頓時間、錯字率(backspaceCount/(backspaceCount+keyCount))
     const keyCount = data.keyCount || 0;
@@ -189,11 +190,30 @@ function calculate_focus(data, lastCalcTime){
     };
 };
 
+const INACTIVITY_THRESHOLD_MS = 4 * 60 * 60 * 1000; //4hr沒打字就重置
 //監聽專注度的鬧鐘(10min更新一次)
 chrome.alarms.onAlarm.addListener((alarm) => {
     console.log("ALARM FIRED", alarm.name, Date.now());
     if (alarm.name === "focusScoreAlarm") {
         chrome.storage.local.get(["keyCount", "backspaceCount", "keyTimestamps", "LAST_CALCULATE_FOCUS", "focus_history"], (data) => {
+          const now = Date.now();
+          const keyTimestamps = data.keyTimestamps || [];
+          const lastKeyTime = keyTimestamps.at(-1) || 0;
+
+          // 超過 4 小時沒打字 → 初始化
+          if (keyTimestamps.length > 0 && now - lastKeyTime > INACTIVITY_THRESHOLD_MS) {
+            chrome.storage.local.set({
+              keyTimestamps: [],
+              keyCount: 0,
+              backspaceCount: 0,
+              last_focus_score: 0,
+              LAST_CALCULATE_FOCUS: 0,
+              focus_history: []
+            }, () => {
+              console.log("User inactive for 4h+, all typing & focus data reset.");
+            });
+            return; // 不用再計算專注度
+          }
           
           const LAST_CALCULATE_FOCUS = data.LAST_CALCULATE_FOCUS || 0;
           let history = data.focus_history || []; 
@@ -202,7 +222,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
           if ((Date.now() - LAST_CALCULATE_FOCUS) >= FOCUS_INTERVAL_MS) {
 
               //算現在的專注度
-              const { now_Delta_v, now_PauseTime, now_ErrorRate } = calculate_focus(data); 
+              const { now_Delta_v, now_PauseTime, now_ErrorRate } = calculate_focus(data, LAST_CALCULATE_FOCUS); 
 
               //找min max
               const dvExtremes = getExtremes(history, 'dv', now_Delta_v); 
