@@ -76,7 +76,8 @@ def check_id():
                     cur.execute(command, (check_id,0))
                     conn.commit()
                     return jsonify({"exists": False, "bias": 0})
-    except:
+    except Exception as e:
+        print("Database error:", e)
         return jsonify({"error": "Database error"}), 500
     
 @app.route("/update_bias", methods=["POST"])
