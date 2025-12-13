@@ -74,11 +74,13 @@ def show_review():
                 for i in range(48):
                     dailyLabels.append(f"{math.floor(i / 2)}:{30*(i%2):02d}")
                     dailyData.append(0)
+                print(1)
                 for i in dailys:
                     p = (i[0]-1) % 48
                     dailyData[p] = i[1]
+                print(2)
                 
-                command = "SELECT day, focus FROM weekly WHERE id = %s AND %s - day < 7"
+                command = "SELECT day, focus FROM weekly WHERE id = %s AND (%s - day) < 7"
                 cur.execute(command, (user_id,now_day))
                 weeklys = cur.fetchall()    # 起始日是星期四
                 weeklyLabels = ['週日', '週一', '週二', '週三', '週四', '週五', '週六']
@@ -87,9 +89,11 @@ def show_review():
                     p = (i[0] + 4) % 7
                     weeklyData[p] = i[1]
                 p_ = (now_day + 4) % 7
+                print(3)
                 weeklyLabels[p_] = "今日"
                 for i in range(p_+1,8):
                     weeklyLabels[i] = "上" + weeklyLabels[i]
+                print(4)
         return render_template('review_AI.html',dailyLabels=dailyLabels,dailyData=dailyData,weeklyLabels=weeklyLabels,weeklyData=weeklyData)
     except Exception as e:
         print("Database error:", e)
