@@ -345,7 +345,13 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     });
   }
   else if (info.menuItemId === "review"){
-    
+    chrome.storage.sync.get(["user_id"],(data)=>{
+        fetch("https://two025fall-computernetwork-aiv7.onrender.com/show_review", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},  
+            body: JSON.stringify({ id: data.user_id , now: Date.now()})
+        })
+    })
   }
 });
 

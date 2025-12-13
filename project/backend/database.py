@@ -23,10 +23,10 @@ def update_focus():
     data = request.json
     now_ms = data.get("now", "")
     now_ms += 8 * 60 * 60 * 1000    # UTC+8
-    now_ms -= 1000  # 避免延遲影響計算
     print("time:",datetime.fromtimestamp(now_ms / 1000, tz=timezone(timedelta(hours=8))))
-    now_ms = math.ceil(now_ms / (1000 * 60 * 30))
     print("ms:",now_ms)
+    now_ms -= 1000  # 避免延遲影響計算
+    now_ms = math.ceil(now_ms / (1000 * 60 * 30))
     focus = data.get("focus", "")
     user_id = data.get("id", "")
     
