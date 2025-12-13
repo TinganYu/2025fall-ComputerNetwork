@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)
 
 load_dotenv()
-DB_URL = os.environ.get("E_DB_URL")
+DB_URL = os.environ.get("I_DB_URL")
 
 '''
 function calculate_date(timestamp){
@@ -95,3 +95,6 @@ def update_bias():
         return jsonify({"log": "update bias success"})
     except:
         return jsonify({"error": "Database error"}), 500
+    
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
