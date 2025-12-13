@@ -37,6 +37,8 @@ function updateDisplay() {
 }
 
 updateDisplay();
+
+//測試用
 function openReminder(){
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         let tab = tabs[0];

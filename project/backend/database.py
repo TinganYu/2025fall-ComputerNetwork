@@ -28,15 +28,15 @@ def update_focus():
     try:
         with psycopg2.connect(DB_URL) as conn:
             with conn.cursor() as cur:
-                command = "SELECT * FROM daily WHERE id = %s AND Timestamps = %s"
+                command = "SELECT * FROM daily WHERE id = %s AND \"Timestamps\" = %s"
                 cur.execute(command, (user_id,now_ms))
                 row = cur.fetchone()
                 if row:
                     focus = (focus + row[2]) / (row[3] + 1)
-                    command = "UPDATE daily SET focus = %s, merge = %s WHERE id = %s AND Timestamps = %s"
+                    command = "UPDATE daily SET focus = %s, merge = %s WHERE id = %s AND \"Timestamps\" = %s"
                     cur.execute(command, (focus,row[3]+1,user_id,now_ms))
                 else:
-                    command = "INSERT INTO daily (id, Timestamps, focus, merge) VALUES (%s, %s, %s, %s)"
+                    command = "INSERT INTO daily (id, \"Timestamps\", focus, merge) VALUES (%s, %s, %s, %s)"
                     cur.execute(command, (user_id,now_ms,focus,1))
                 conn.commit()
             # 推到 weekly 跟刪掉日回顧 可以用trigger? 加了待測試
@@ -80,7 +80,7 @@ def check_id():
         print("Database error:", e)
         return jsonify({"error": "Database error"}), 500
     
-@app.route("/update_bias", methods=["POST"])
+@app.route("/update_bias", methods=["POST","OPTIONS"])
 def update_bias():
     data = request.json
     user_id = data.get("id", "")
@@ -94,7 +94,7 @@ def update_bias():
                 command = "UPDATE users SET bias = %s WHERE id = %s"
                 cur.execute(command, (new_bias,user_id))
                 conn.commit()
-        return jsonify({"log": "update bias success"}),200
+        return jsonify({"log": "update bias success"})
     except:
         return jsonify({"error": "Database error"}), 500
     
