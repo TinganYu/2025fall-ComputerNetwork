@@ -66,7 +66,7 @@ def show_review():
         with psycopg2.connect(DB_URL) as conn:
             with conn.cursor() as cur:
                 data = request.json
-                command = "SELECT \"Timestamps\", focus FROM daily WHERE user_id = %s AND (\"Timestamps\"-1)/48 = %s"
+                command = "SELECT \"Timestamps\", focus FROM daily WHERE id = %s AND (\"Timestamps\"-1)/48 = %s"
                 cur.execute(command, (user_id,now_day))
                 dailys = cur.fetchall()
                 dailyLabels = []
@@ -78,7 +78,7 @@ def show_review():
                     p = (i[0]-1) % 48
                     dailyData[p] = i[1]
                 
-                command = "SELECT day, focus FROM weekly WHERE user_id = %s AND %s - day < 7"
+                command = "SELECT day, focus FROM weekly WHERE id = %s AND %s - day < 7"
                 cur.execute(command, (user_id,now_day))
                 weeklys = cur.fetchall()    # 起始日是星期四
                 weeklyLabels = ['週日', '週一', '週二', '週三', '週四', '週五', '週六']

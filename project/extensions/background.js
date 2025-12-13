@@ -351,7 +351,11 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
             headers: {"Content-Type":"application/json"},  
             body: JSON.stringify({ id: data.user_id , now: Date.now()})
         })
-    })
+        .then(r => r.json().catch(()=>{}))
+        .then(data => {
+            console.log("[Eileen's Part] show review: ",data);
+        });
+        })
   }
 });
 
