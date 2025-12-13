@@ -1,4 +1,4 @@
-//處理停頓時間指標 TODO 要記恍神次數嗎？ 
+//處理停頓時間指標 
 const LONG_PAUSE_THRESHOLD = 60000 //停1min才算停頓時間(盡量讓思考時間不會被記錄)
 function analyzePauseTime(timestamps) {
     if (timestamps.length < 2) { 
