@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)
 
 load_dotenv()
-DB_URL = os.environ.get("I_DB_URL")
+DB_URL = os.environ.get("E_DB_URL")
 
 '''
 function calculate_date(timestamp){
