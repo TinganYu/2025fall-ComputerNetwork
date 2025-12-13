@@ -344,28 +344,16 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       });
     });
   }
-  else if (info.menuItemId === "review"){
+  else if (info.menuItemId === "review"){   //開啟回顧html
     chrome.storage.sync.get(["user_id"],(data)=>{
         chrome.tabs.create({ url: `https://two025fall-computernetwork-aiv7.onrender.com/show_review?id=${data.user_id}&now=${Date.now()}` } );
-        /*fetch("https://two025fall-computernetwork-aiv7.onrender.com/show_review", {
-            method: "POST",
-            headers: {"Content-Type":"application/json"},  
-            body: JSON.stringify({ id: data.user_id , now: Date.now()})
-        })
-        .then(r => r.text())
-        .then(html => {
-            const blob = new Blob([html], { type: "text/html" });
-            const url = URL.createObjectURL(blob);
-            window.open(url, "_blank");
-            console.log("[Eileen's Part] review show: ",html);
-        });*/
-        })
+    })
   }
 });
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
-  if (msg && msg.action === "openReminder") {
+  if (msg && msg.action === "openReminder") {   //在現在所在 html 插入低跳提醒彈窗
     //console.log("try to open reminder");
     chrome.tabs.sendMessage(msg.tab.id, {action: "showWindow"},
       (response) => {
@@ -377,7 +365,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       });
   }
 
-  else if (msg && msg.action == "updateBias"){
+  else if (msg && msg.action == "updateBias"){  //更新 db bias
     fetch("https://two025fall-computernetwork-aiv7.onrender.com/update_bias", {
         method: "POST",
         headers: {"Content-Type":"application/json"},

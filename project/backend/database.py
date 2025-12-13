@@ -12,13 +12,15 @@ load_dotenv()
 DB_URL = os.environ.get("E_DB_URL")
 
 '''
-function calculate_date(timestamp){
-  const days = Math.floor(timestamp / (1000 * 60 * 60 * 24));
-  return days;
-}'''
+database 中 有 trigger
+會在每次上傳 focus 時，即時更新今日目前的平均專注度
+並刪除今日前的 focus 資料
+
+database error 請回報到群組，能附上時間最好
+'''
 from datetime import datetime, timezone, timedelta
 
-@app.route("/update_focus", methods=["POST"])
+@app.route("/update_focus", methods=["POST"])   # 上傳專注度
 def update_focus():
     data = request.json
     now_ms = data.get("now", "")
@@ -44,13 +46,12 @@ def update_focus():
                     command = "INSERT INTO daily (id, \"Timestamps\", focus, merge) VALUES (%s, %s, %s, %s)"
                     cur.execute(command, (user_id,now_ms,focus,1))
                 conn.commit()
-            # 推到 weekly 跟刪掉日回顧 可以用trigger? 加了待測試
         return jsonify({"log": "update focus success"})
     except Exception as e:
         print("Database error:", e)
         return jsonify({"error": "Database error"}), 500
     
-@app.route("/show_review", methods=["GET"])
+@app.route("/show_review", methods=["GET"]) #顯示日回顧跟周回顧
 def show_review():
     now_ms = int(request.args.get('now'))
     now_ms += 8 * 60 * 60 * 1000    # UTC+8
@@ -94,7 +95,7 @@ def show_review():
         print("Database error:", e)
         return jsonify({"error": "Database error"}), 500
 
-@app.route("/check_id", methods=["POST"])
+@app.route("/check_id", methods=["POST"])   # 確定 id 有沒有重複、回傳 bias
 def check_id():
     data = request.json
     check_id = data.get("id", "")
@@ -119,7 +120,7 @@ def check_id():
         print("Database error:", e)
         return jsonify({"error": "Database error"}), 500
     
-@app.route("/update_bias", methods=["POST","OPTIONS"])
+@app.route("/update_bias", methods=["POST"])    # 更新 user 的 bias
 def update_bias():
     data = request.json
     user_id = data.get("id", "")
