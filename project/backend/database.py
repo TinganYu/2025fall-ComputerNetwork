@@ -91,7 +91,7 @@ def show_review():
                 p_ = (now_day + 4) % 7
                 print(3)
                 weeklyLabels[p_] = "今日"
-                for i in range(p_+1,8):
+                for i in range(p_+1,7):
                     weeklyLabels[i] = "上" + weeklyLabels[i]
                 print(4)
         return render_template('review_AI.html',dailyLabels=dailyLabels,dailyData=dailyData,weeklyLabels=weeklyLabels,weeklyData=weeklyData)
