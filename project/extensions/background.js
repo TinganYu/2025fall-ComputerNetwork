@@ -346,15 +346,19 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
   else if (info.menuItemId === "review"){
     chrome.storage.sync.get(["user_id"],(data)=>{
-        fetch("https://two025fall-computernetwork-aiv7.onrender.com/show_review", {
+        chrome.tabs.create({ url: `https://two025fall-computernetwork-aiv7.onrender.com/show_review?user_id=${data.user_id}&now=${Date.now()}` } );
+        /*fetch("https://two025fall-computernetwork-aiv7.onrender.com/show_review", {
             method: "POST",
             headers: {"Content-Type":"application/json"},  
             body: JSON.stringify({ id: data.user_id , now: Date.now()})
         })
-        .then(r => r.json().catch(()=>{}))
-        .then(data => {
-            console.log("[Eileen's Part] show review: ",data);
-        });
+        .then(r => r.text())
+        .then(html => {
+            const blob = new Blob([html], { type: "text/html" });
+            const url = URL.createObjectURL(blob);
+            window.open(url, "_blank");
+            console.log("[Eileen's Part] review show: ",html);
+        });*/
         })
   }
 });

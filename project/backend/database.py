@@ -50,14 +50,13 @@ def update_focus():
         print("Database error:", e)
         return jsonify({"error": "Database error"}), 500
     
-@app.route("/show_review", methods=["POST"])
+@app.route("/show_review", methods=["GET"])
 def show_review():
-    data = request.json
-    now_ms = data.get("now", "")
+    now_ms = int(request.args.get('now'))
     now_ms += 8 * 60 * 60 * 1000    # UTC+8
     now_ms -= 1000  # 避免延遲影響計算
     now_day = math.floor((math.ceil(now_ms / (1000 * 60 * 30)) -1) / 48)
-    user_id = data.get("id","")
+    user_id = request.args.get('id')
     if not user_id or not now_ms:
         print(data)
         return jsonify({"error": "Request error"}), 400
