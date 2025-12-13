@@ -45,7 +45,7 @@ chrome.runtime.onInstalled.addListener(() => {
       .then(r => r.json().catch(()=>{}))
       .then(data => {
         chrome.storage.sync.set({ bias: data.bias });
-        console.log("User bias:", data);
+        console.log("[Eileen's part] Get user bias:", data);
       });
     }
   });
@@ -287,9 +287,10 @@ chrome.alarms.onAlarm.addListener((alarm) => {
                     LAST_CALCULATE_FOCUS: Date.now(),
                     focus_history: history 
                 }, () => {
-                    if (finalScore < 20)
+                    if (finalScore < 20)    //待調整 專注力提醒
                         openReminder(); 
-                    //TODO
+
+                    // 將 focus 存進 db
                     fetch("https://two025fall-computernetwork-aiv7.onrender.com/update_focus", {
                         method: "POST",
                         headers: {"Content-Type":"application/json"},  
