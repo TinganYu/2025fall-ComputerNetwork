@@ -260,8 +260,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
                 
                 // 算FocusScore S (假設 w1=0.33, w2=0.33, w3=0.34, b=0)
                 // S = w1*Delta_v' + w2*p' + w3*d' + b
-                const bias = data_sync.bias || 0; // 從 sync 讀取偏置項 (有從sync讀到嗎?待確認)
-                console.log("bias correct?",data.bias)
+                const bias = data_sync.bias || 0; // 從 sync 讀取偏置項
                 const focusScore = ((0.33 * deltaVPrime) + (0.33 * pauseTimePrime) + (0.34 * errorRatePrime)) * 100 + bias;
 
                 // 確保分數在 0 到 100 之間
