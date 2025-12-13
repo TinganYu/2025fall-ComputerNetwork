@@ -44,7 +44,7 @@ def update_focus():
     except:
         return jsonify({"error": "Database error"}), 500
     
-@app.route("/show_review", methods=["POST"])
+'''@app.route("/show_review", methods=["POST"])
 def show_review():
     with psycopg2.connect(DB_URL) as conn:
         with conn.cursor() as cur:
@@ -52,7 +52,7 @@ def show_review():
             command = "SELECT * FROM your_table WHERE user_id = %s"
             cur.execute(command, (None,))
             rows = cur.fetchall()
-    return
+    return'''
 
 @app.route("/check_id", methods=["POST"])
 def check_id():

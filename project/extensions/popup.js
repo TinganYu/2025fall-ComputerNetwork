@@ -14,13 +14,6 @@ function analyzePauseTime(timestamps) {
     return totalPauseTime;
 }
 
-function openReminder(){    //開啟專注度低跳提醒
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        let tab = tabs[0];
-        chrome.runtime.sendMessage({ action: "openReminder" ,tab: tab});
-    });
-}
-
 //打字相關資訊呈現
 function updateDisplay() {
     chrome.storage.local.get(["keyCount", "backspaceCount", "keyTimestamps", "last_focus_score"], (data) => {
@@ -44,4 +37,4 @@ function updateDisplay() {
 }
 
 updateDisplay();
-openReminder();
+//openReminder();
