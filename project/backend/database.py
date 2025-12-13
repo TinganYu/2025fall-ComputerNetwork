@@ -16,14 +16,15 @@ function calculate_date(timestamp){
   const days = Math.floor(timestamp / (1000 * 60 * 60 * 24));
   return days;
 }'''
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 @app.route("/update_focus", methods=["POST"])
 def update_focus():
     data = request.json
     now_ms = data.get("now", "")
+    now_ms += 8 * 60 * 60 * 1000    # UTC+8
     now_ms -= 1000  # 避免延遲影響計算
-    print("time:",datetime.fromtimestamp(now_ms / 1000, tz=timezone.utc))
+    print("time:",datetime.fromtimestamp(now_ms / 1000, tz=timezone(timedelta(hours=8))))
     now_ms = math.ceil(now_ms / (1000 * 60 * 30))
     print("ms:",now_ms)
     focus = data.get("focus", "")
@@ -51,13 +52,27 @@ def update_focus():
     
 @app.route("/show_review", methods=["POST"])
 def show_review():
+    data = request.json
+    now_ms = data.get("now", "")
+    now_ms += 8 * 60 * 60 * 1000    # UTC+8
+    now_ms -= 1000  # 避免延遲影響計算
+    now_day = (math.ceil(now_ms / (1000 * 60 * 30)) -1) / 48
+    user_id = data.get("id","")
+    if not user_id or not now_ms:
+        print(data)
+        return jsonify({"error": "Request error"}), 400
+    
     try:
         with psycopg2.connect(DB_URL) as conn:
             with conn.cursor() as cur:
                 data = request.json
-                command = "SELECT * FROM your_table WHERE user_id = %s"
-                cur.execute(command, (None,))
-                rows = cur.fetchall()
+                command = f"SELECT \"Timestamps\", focus FROM your_table WHERE user_id = %s AND (\"Timestamps\"-1)/48 = {now_day}"
+                cur.execute(command, (user_id,))
+                dailys = cur.fetchall()
+                
+                command = f"SELECT \"Timestamps\", focus FROM your_table WHERE user_id = %s AND (\"Timestamps\"-1)/48 = {now_day}"
+                cur.execute(command, (user_id,))
+                dailys = cur.fetchall()
     except Exception as e:
         print("Database error:", e)
         return jsonify({"error": "Database error"}), 500
