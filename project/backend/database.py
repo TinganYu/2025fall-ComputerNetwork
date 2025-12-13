@@ -21,7 +21,7 @@ function calculate_date(timestamp){
 def update_focus():
     data = request.json
     now_ms = data.get("now", "")
-    now_ms = math.ceil(now_ms / 1000 * 60 * 30)
+    now_ms = math.ceil(now_ms / (1000 * 60 * 30))
     focus = data.get("focus", "")
     user_id = data.get("id", "")
     
@@ -45,7 +45,7 @@ def update_focus():
         print("Database error:", e)
         return jsonify({"error": "Database error"}), 500
     
-'''@app.route("/show_review", methods=["POST"])
+@app.route("/show_review", methods=["POST"])
 def show_review():
     with psycopg2.connect(DB_URL) as conn:
         with conn.cursor() as cur:
@@ -53,7 +53,7 @@ def show_review():
             command = "SELECT * FROM your_table WHERE user_id = %s"
             cur.execute(command, (None,))
             rows = cur.fetchall()
-    return'''
+    return
 
 @app.route("/check_id", methods=["POST"])
 def check_id():
