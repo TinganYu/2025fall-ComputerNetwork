@@ -64,7 +64,6 @@ def show_review():
     try:
         with psycopg2.connect(DB_URL) as conn:
             with conn.cursor() as cur:
-                data = request.json
                 command = "SELECT \"Timestamps\", focus FROM daily WHERE id = %s AND (\"Timestamps\"-1)/48 = %s"
                 cur.execute(command, (user_id,now_day))
                 dailys = cur.fetchall()

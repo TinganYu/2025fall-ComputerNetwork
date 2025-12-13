@@ -346,7 +346,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
   else if (info.menuItemId === "review"){
     chrome.storage.sync.get(["user_id"],(data)=>{
-        chrome.tabs.create({ url: `https://two025fall-computernetwork-aiv7.onrender.com/show_review?user_id=${data.user_id}&now=${Date.now()}` } );
+        chrome.tabs.create({ url: `https://two025fall-computernetwork-aiv7.onrender.com/show_review?id=${data.user_id}&now=${Date.now()}` } );
         /*fetch("https://two025fall-computernetwork-aiv7.onrender.com/show_review", {
             method: "POST",
             headers: {"Content-Type":"application/json"},  
