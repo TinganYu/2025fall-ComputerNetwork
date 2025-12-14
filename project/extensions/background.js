@@ -64,7 +64,14 @@ chrome.runtime.onInstalled.addListener(() => {
 function openReminder(){
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         let tab = tabs[0];
-        chrome.runtime.sendMessage({ action: "openReminder" ,tab: tab});
+        chrome.tabs.sendMessage(tab.id, {action: "showWindow"},
+          (response) => {
+            if(chrome.runtime.lastError)
+              chrome.scripting.executeScript({
+                target: { tabId: tab.id, allFrames: true },
+                files: ["reminder.js"]
+              });
+        });
     });
 }
 
@@ -246,6 +253,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
             const LAST_CALCULATE_FOCUS = data.LAST_CALCULATE_FOCUS || 0;
             let history = data.focus_history || []; 
             console.log("確認週期");
+            openReminder();
             // 檢查是否已達到計算週期(過了10分鐘)
             if ((Date.now() - LAST_CALCULATE_FOCUS) >= FOCUS_INTERVAL_MS) {
 
@@ -352,20 +360,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-
-  if (msg && msg.action === "openReminder") {   //在現在所在 html 插入低跳提醒彈窗
-    //console.log("try to open reminder");
-    chrome.tabs.sendMessage(msg.tab.id, {action: "showWindow"},
-      (response) => {
-        if(chrome.runtime.lastError)
-          chrome.scripting.executeScript({
-            target: { tabId: msg.tab.id, allFrames: true },
-            files: ["reminder.js"]
-          });
-      });
-  }
-
-  else if (msg && msg.action == "updateBias"){  //更新 db bias
+  if (msg && msg.action == "updateBias"){  //更新 db bias
     fetch("https://two025fall-computernetwork-aiv7.onrender.com/update_bias", {
         method: "POST",
         headers: {"Content-Type":"application/json"},
