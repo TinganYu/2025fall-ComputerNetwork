@@ -253,7 +253,6 @@ chrome.alarms.onAlarm.addListener((alarm) => {
             const LAST_CALCULATE_FOCUS = data.LAST_CALCULATE_FOCUS || 0;
             let history = data.focus_history || []; 
             console.log("確認週期");
-            openReminder();
             // 檢查是否已達到計算週期(過了10分鐘)
             if ((Date.now() - LAST_CALCULATE_FOCUS) >= FOCUS_INTERVAL_MS) {
 
